@@ -1,0 +1,195 @@
+:root {
+  --bg: #ffffff;
+  --fg: #1a1a1a;
+  --muted: #666666;
+  --accent: #0066cc;
+  --border: #e0e0e0;
+  --gap: 1.5rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f0f0f;
+    --fg: #e8e8e8;
+    --muted: #999999;
+    --accent: #4da6ff;
+    --border: #2a2a2a;
+  }
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.6;
+  min-height: 100dvh;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Landing page */
+.landing {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 100dvh;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  gap: var(--gap);
+}
+
+.landing h1 {
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.landing .bio {
+  color: var(--muted);
+  font-size: 1.1rem;
+}
+
+.landing nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  font-size: 1rem;
+}
+
+.dashboard-link {
+  margin-top: 2rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.dashboard-link:hover {
+  color: var(--fg);
+  text-decoration: none;
+}
+
+/* Dashboard shared */
+.dash-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.dash-header h1 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: lowercase;
+}
+
+.last-updated {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.range-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.range-buttons button {
+  padding: 0.3rem 0.75rem;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--fg);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.range-buttons button:hover {
+  background: var(--border);
+}
+
+.range-buttons button.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.chart-wrap {
+  margin-bottom: 1.5rem;
+}
+
+.doc-count {
+  font-size: 0.72rem;
+  color: var(--muted);
+  margin-bottom: 2rem;
+}
+
+.dash-footer {
+  font-size: 0.8rem;
+  color: var(--muted);
+  padding: 1rem 0;
+  border-top: 1px solid var(--border);
+}
+
+/* Password gate */
+.gate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+}
+
+.gate form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: min(320px, 90vw);
+}
+
+.gate input[type="password"] {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--fg);
+  border-radius: 6px;
+  font-size: 1rem;
+  outline: none;
+}
+
+.gate input[type="password"]:focus {
+  border-color: var(--accent);
+}
+
+.gate button[type="submit"] {
+  padding: 0.6rem;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.gate .error {
+  font-size: 0.8rem;
+  color: #e05050;
+  min-height: 1em;
+}

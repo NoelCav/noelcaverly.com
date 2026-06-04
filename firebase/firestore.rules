@@ -1,0 +1,21 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /raw/{doc} {
+      allow read:   if request.auth != null;
+      allow create: if request.auth != null
+                    && request.resource.data.keys().hasAll(
+                         ['timestamp','temperature','humidity','light','sound','dust'])
+                    && request.resource.data.timestamp is int;
+      allow update, delete: if false;
+    }
+    match /agg_30m/{doc} {
+      allow read:  if request.auth != null;
+      allow write: if false;
+    }
+    match /agg_1h/{doc} {
+      allow read:  if request.auth != null;
+      allow write: if false;
+    }
+  }
+}
