@@ -14,18 +14,6 @@
   --radius:   12px;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    --bg:       #f8f8fa;
-    --bg-card:  #ffffff;
-    --fg:       #18181b;
-    --fg-dim:   #71717a;
-    --accent:   #5b4de3;
-    --accent-2: #0284c7;
-    --border:   rgba(0,0,0,0.07);
-    --glow:     rgba(91,77,227,0.10);
-  }
-}
 
 /* ══════════════════════════════════════════
    Reset & base
@@ -58,9 +46,9 @@ a:hover { text-decoration: underline; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  max-width: 720px;
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 1.5rem 1.5rem 0;
+  padding: 1.5rem 2.5rem 0;
 }
 
 .topnav-logo {
@@ -94,9 +82,9 @@ a:hover { text-decoration: underline; }
    ══════════════════════════════════════════ */
 
 .hero {
-  max-width: 720px;
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 4.5rem 1.5rem 3.5rem;
+  padding: 4.5rem 2.5rem 3.5rem;
   position: relative;
 }
 
@@ -202,9 +190,9 @@ a:hover { text-decoration: underline; }
    ══════════════════════════════════════════ */
 
 .content {
-  max-width: 720px;
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 2.5rem;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -259,9 +247,6 @@ a:hover { text-decoration: underline; }
   background: #1a1a1c;
 }
 
-@media (prefers-color-scheme: light) {
-  .resume-frame { background: #f0f0f2; }
-}
 
 .resume-frame iframe {
   display: block;
@@ -279,9 +264,9 @@ a:hover { text-decoration: underline; }
    ══════════════════════════════════════════ */
 
 .site-footer {
-  max-width: 720px;
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 2.5rem 1.5rem;
+  padding: 2.5rem 2.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
