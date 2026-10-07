@@ -6,6 +6,9 @@ on:
 jobs:
   rollup:
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -17,3 +20,8 @@ jobs:
         working-directory: scripts
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      # GitHub disables scheduled workflows after 60 days without commits;
+      # re-enabling resets that timer so the nightly run keeps going.
+      - run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/rollup.yml/enable"
+        env:
+          GH_TOKEN: ${{ github.token }}

@@ -4,11 +4,15 @@
 
 ```
 noelcaverly.com/
-├── CNAME                          # "noelcaverly.com"
-├── index.html
+├── CNAME                          # "www.noelcaverly.com" (www is canonical)
+├── index.html                     # datasheet-style homepage
 ├── assets/
-│   ├── style.css
-│   └── resume.pdf                 # placeholder — user will add
+│   ├── style.css                  # shared by homepage, dashboard, mods
+│   ├── resume.pdf
+│   └── Noel_Caverly_Resume_2026.docx
+├── mods/                          # template pages, intentionally unlinked
+│   ├── index.html
+│   └── example-game/index.html
 ├── dashboard/
 │   ├── index.html
 │   └── dashboard.js
@@ -16,7 +20,6 @@ noelcaverly.com/
 │   ├── package.json               # firebase-admin only
 │   └── rollup.js
 ├── .github/workflows/
-│   ├── deploy.yml
 │   └── rollup.yml
 ├── firebase/
 │   └── firestore.rules
@@ -26,30 +29,13 @@ noelcaverly.com/
 Root `.gitignore`: `node_modules/`, `.env`, `serviceAccount*.json`  
 No build step, no bundler, no root-level `package.json`. Site deploys as static files.
 
+**Current state:** all phases are built and live. Treat the phases below as the original spec; where they differ from the code, the code wins.
+
 ---
 
-## Phase 1 — repo scaffold + deploy workflow
+## Phase 1 — repo scaffold + deploy
 
-Create all directories and placeholder files. Wire up the deploy workflow below and confirm the site deploys (even a blank page) before proceeding.
-
-### `.github/workflows/deploy.yml`
-
-```yaml
-name: deploy
-on:
-  push:
-    branches: [main]
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./
-          exclude_assets: '.github,scripts,firebase,README.md'
-```
+GitHub Pages deploys directly from `main` (Settings → Pages → Deploy from a branch, via the built-in `pages-build-deployment`). There is no `deploy.yml`; don't add one. Every file in the repo is publicly served, so never commit secrets.
 
 ---
 
@@ -60,6 +46,7 @@ jobs:
 - Static HTML/CSS only — zero JavaScript
 - Mobile-responsive, `prefers-color-scheme` dark/light
 - Content: name, one-line bio, three links (LinkedIn, GitHub, `/assets/resume.pdf` download), low-key link to `/dashboard/`
+- Current design is a component datasheet (pinout, specs table, revision history). Pin 5 "MODS" is a plain label on purpose — don't link it until the user asks.
 
 ### `assets/style.css`
 
@@ -71,31 +58,12 @@ Shared styles used by both pages. Use CSS variables for theming.
 
 ### `firebase/firestore.rules`
 
-```
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /raw/{doc} {
-      allow read:   if request.auth != null;
-      allow create: if request.auth != null
-                    && request.resource.data.keys().hasAll(
-                         ['timestamp','temperature','humidity','light','sound','dust'])
-                    && request.resource.data.timestamp is int;
-      allow update, delete: if false;
-    }
-    match /agg_30m/{doc} {
-      allow read:  if request.auth != null;
-      allow write: if false;
-    }
-    match /agg_1h/{doc} {
-      allow read:  if request.auth != null;
-      allow write: if false;
-    }
-  }
-}
-```
+See the file for the current rules. Summary:
+- `raw`: create only by the ESP32's Email/Password account (`sign_in_provider == 'password'`) with a string `device_id`; read by any signed-in user; no update/delete.
+- `agg_30m`, `agg_1h`: read by any signed-in user; no client writes.
+- Everything else denied.
 
-Rollup writes use the Admin SDK (service account), which bypasses these rules. Anonymous auth satisfies the `request.auth != null` requirement for dashboard reads without exposing writes.
+Rollup writes use the Admin SDK (service account), which bypasses these rules. The dashboard signs in anonymously, which satisfies read rules but can't write.
 
 ### README Firebase checklist
 
@@ -106,6 +74,7 @@ Add a checklist to `README.md` for manual Firebase setup steps the agent cannot 
 - [ ] Create Firebase project
 - [ ] Enable Firestore in production mode
 - [ ] Enable Anonymous Authentication
+- [ ] Enable Email/Password Authentication → create the ESP32 device user
 - [ ] Copy web API key → paste into dashboard.js (FIREBASE_CONFIG)
 - [ ] Deploy firestore.rules: `firebase deploy --only firestore:rules`
 - [ ] Create service account → download JSON → add to GitHub Secret: FIREBASE_SERVICE_ACCOUNT
@@ -119,16 +88,27 @@ Add a checklist to `README.md` for manual Firebase setup steps the agent cannot 
 
 ```json
 {
+  "device_id": "ambient-01",
   "timestamp": 1700000000,
+  "expireAt": "2025-05-30T00:00:00Z",
   "temperature": 22.4,
   "humidity": 58.1,
-  "light": 320,
-  "sound": 47,
-  "dust": 12.3
+  "pressure": 1013.25,
+  "bme_valid": true,
+  "pm1_0": 5,
+  "pm2_5": 12,
+  "pm10": 18,
+  "pms_valid": true,
+  "sound_avg": 47,
+  "sound_peak": 63,
+  "light": 320
 }
 ```
 
-`timestamp` is Unix epoch seconds (integer). All five sensor fields are always present.
+`timestamp` is Unix epoch seconds (integer). `expireAt` is a Firestore timestampValue for TTL auto-deletion (6 months).
+BME fields (`temperature`, `humidity`, `pressure`) are only present when `bme_valid` is true.
+PMS fields (`pm1_0`, `pm2_5`, `pm10`) are only present when `pms_valid` is true.
+`sound_avg`, `sound_peak`, `light`, `device_id`, `bme_valid`, `pms_valid` are always present.
 
 ### `dashboard/index.html` — password gate
 
@@ -197,7 +177,9 @@ On range change: check cache first; fetch Firestore only on miss or expiry.
 [header: "ambient monitor"  |  last updated: <timestamp>]
 [pill buttons: 6h | 24h | 7d | 30d | 3m | 1y | all]
 [Chart 1: Temperature °C (left Y) + Humidity % (right Y) — dual-axis line]
-[Chart 2: Light lux + Sound dB + Dust µg/m³ — three lines, shared Y]
+[Chart 2: Pressure hPa — single line]
+[Chart 3: PM2.5 + PM10 + PM1.0 µg/m³ — three lines, shared Y]
+[Chart 4: Sound avg + Sound peak + Light lux — three lines, shared Y]
 [muted small label: "loaded 144 documents from raw"]
 [footer: link → noelcaverly.com]
 ```
@@ -238,13 +220,14 @@ layout: { paper_bgcolor: 'transparent', plot_bgcolor: 'transparent' }
 2. raw → agg_30m:
    - Query raw/ where timestamp < raw_cutoff
    - Group into 30-min windows (floor timestamp to nearest 30 min)
-   - Per window: avg all 5 fields + count source docs
+   - Per window: avg all sensor fields (only fields present in source docs) + count
    - Upsert to agg_30m/{windowStart} (set with merge — idempotent)
    - Batch-delete source raw docs (max 500 per batch)
 
 3. agg_30m → agg_1h:
    - Query agg_30m/ where timestamp < agg30_cutoff
    - Group into 1-hr windows
+   - Group into 1-hr windows, weighting each agg_30m doc by its `count`
    - Upsert to agg_1h/{windowStart}, batch-delete source
 
 4. stdout: "rolled up X raw → Y agg_30m, Z agg_30m → W agg_1h"
@@ -283,6 +266,8 @@ jobs:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
 ```
 
+The live workflow also has a final step that re-enables itself through the GitHub API (needs `permissions: actions: write`), because GitHub disables scheduled workflows after 60 days without commits.
+
 Verify with a manual `workflow_dispatch` trigger before relying on cron.
 
 ---
@@ -294,8 +279,9 @@ Add a `## Cloudflare setup (manual)` checklist to `README.md`:
 ```
 - [ ] DNS A records for noelcaverly.com → GitHub Pages IPs (proxied):
         185.199.108.153 / .109.153 / .110.153 / .111.153
-- [ ] DNS CNAME www → noelcaverly.com (proxied)
+- [ ] DNS CNAME www → noelcav.github.io (proxied)
 - [ ] SSL/TLS mode: Full (strict)
+- [ ] Redirect rule (template "Redirect Apex to WWW"): noelcaverly.com → https://www.noelcaverly.com
 - [ ] Firewall rule "block dashboard non-home":
         Expression: (http.request.uri.path contains "/dashboard") and (ip.src ne YOUR_HOME_IP)
         Action: Block
@@ -315,3 +301,5 @@ Add a `## Cloudflare setup (manual)` checklist to `README.md`:
 | No localStorage | Use `sessionStorage` for both auth token and data cache |
 | No unbounded queries | Every Firestore query must have a timestamp range filter |
 | No client-side filter-after-fetch | Query only the collection + range the user selected |
+
+Other records in the zone (e.g. `jellyfin`) are DNS-only on purpose: proxying video streaming violates Cloudflare's ToS. Don't proxy them.
