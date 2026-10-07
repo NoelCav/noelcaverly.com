@@ -253,6 +253,7 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .ds-specs td:first-child { font-family: var(--f-sans); font-size: 0.9rem; }
 
 .ds-revs td:nth-child(-n+2) { white-space: nowrap; }
+.ds-revs th:last-child { width: 100%; }
 
 .pinout + .ds-table-wrap { margin-top: 1.25rem; }
 
@@ -336,6 +337,40 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   width: 100%;
   height: 720px;
   border: none;
+}
+
+
+/* ══════════════════════════════════════════
+   Mods pages
+   ══════════════════════════════════════════ */
+
+.ds-main-top { padding-top: 2.25rem; }
+
+.ds-select td:first-child { font-family: var(--f-sans); font-size: 0.95rem; white-space: nowrap; }
+
+.ds-gap { margin-top: 1.25rem; }
+
+.ds-h3 {
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.ds-steps {
+  padding-left: 1.4rem;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.ds-steps li::marker { font-family: var(--f-mono); }
+
+.ds-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
 }
 
 

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Example Game Mods — Noel Caverly</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/assets/style.css" />
+</head>
+<body>
+<div class="sheet">
+
+  <div class="ds-bar">
+    <a href="/">NC-2026</a>
+    <a href="/mods/">&larr; All mods</a>
+    <span>Example Game</span>
+  </div>
+
+  <header class="ds-title-block">
+    <div>
+      <h1 class="ds-title">Example Game</h1>
+      <p class="ds-sub">Mods for Example Game.</p>
+    </div>
+  </header>
+
+  <main class="ds-main-top">
+
+    <!-- ── Mod entry ──
+         Copy one <section> per mod and bump the section number.
+         Host the files on GitHub Releases (not in this repo) and paste the
+         release asset URL into the download links:
+         https://github.com/NoelCav/<mods-repo>/releases/download/<tag>/<file> -->
+    <section>
+      <h2 class="ds-h"><span>1</span>Example Mod</h2>
+      <div class="ds-prose">
+        <p>What the mod does, in a sentence or two.</p>
+      </div>
+
+      <div class="ds-table-wrap ds-gap">
+        <table class="ds-table">
+          <caption>Ordering Information</caption>
+          <thead><tr><th>Version</th><th>Game version</th><th>Requires</th><th class="num">Size</th><th>Download</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>v1.0.0</td><td>1.0</td><td>Nothing</td><td class="num">1.2 MB</td>
+              <td><a href="https://github.com/NoelCav/MODS-REPO/releases/download/v1.0.0/example-mod.zip">example-mod.zip</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="ds-h3">Installation</h3>
+      <ol class="ds-steps">
+        <li>Download the zip above.</li>
+        <li>Extract it into the game's mods folder.</li>
+        <li>Launch the game.</li>
+      </ol>
+
+      <div class="ds-table-wrap ds-gap">
+        <table class="ds-table ds-revs">
+          <caption>Revision History</caption>
+          <thead><tr><th>Version</th><th>Date</th><th>Changes</th></tr></thead>
+          <tbody>
+            <tr><td>v1.0.0</td><td>2026-10-07</td><td>Initial release.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="ds-actions">
+        <a class="ds-btn" href="https://github.com/NoelCav/MODS-REPO/releases/download/v1.0.0/example-mod.zip">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 20h14v-2H5m14-9h-4V3H9v6H5l7 7 7-7Z"/></svg>
+          Download v1.0.0
+        </a>
+        <a class="ds-btn ds-btn-ghost" href="https://github.com/NoelCav/MODS-REPO/releases" target="_blank" rel="noopener">Older versions</a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="ds-footer">
+    <span>Copyright &copy; 2026, Noel Caverly</span>
+    <a href="/mods/">all mods</a>
+    <span>NC-2026 Mods &middot; Example Game</span>
+  </footer>
+
+</div>
+</body>
+</html>
