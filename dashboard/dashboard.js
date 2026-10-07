@@ -116,11 +116,29 @@ function plotCharts(data, range) {
     yaxis2: { ...layout.xaxis, title: '%', overlaying: 'y', side: 'right' },
   }, config);
 
-  // Chart 2: Light + Sound + Dust
+  // Chart 2: Pressure
   Plotly.react('chart2', [
-    { x: ts, y: data.map(d => d.light), name: 'Light lux',   type: 'scatter', mode: 'lines', line: { color: '#facc15' } },
-    { x: ts, y: data.map(d => d.sound), name: 'Sound dB',    type: 'scatter', mode: 'lines', line: { color: '#a78bfa' } },
-    { x: ts, y: data.map(d => d.dust),  name: 'Dust µg/m³',  type: 'scatter', mode: 'lines', line: { color: '#6ee7b7' } },
+    { x: ts, y: data.map(d => d.pressure), name: 'Pressure hPa', type: 'scatter', mode: 'lines', line: { color: '#34d399' } },
+  ], {
+    ...layout,
+    yaxis: { ...layout.xaxis, title: 'hPa' },
+  }, config);
+
+  // Chart 3: PM2.5 + PM10
+  Plotly.react('chart3', [
+    { x: ts, y: data.map(d => d.pm2_5), name: 'PM2.5 µg/m³', type: 'scatter', mode: 'lines', line: { color: '#6ee7b7' } },
+    { x: ts, y: data.map(d => d.pm10),  name: 'PM10 µg/m³',  type: 'scatter', mode: 'lines', line: { color: '#f472b6' } },
+    { x: ts, y: data.map(d => d.pm1_0), name: 'PM1.0 µg/m³', type: 'scatter', mode: 'lines', line: { color: '#94a3b8' } },
+  ], {
+    ...layout,
+    yaxis: { ...layout.xaxis, title: 'µg/m³' },
+  }, config);
+
+  // Chart 4: Sound + Light
+  Plotly.react('chart4', [
+    { x: ts, y: data.map(d => d.sound_avg),  name: 'Sound avg',  type: 'scatter', mode: 'lines', line: { color: '#a78bfa' } },
+    { x: ts, y: data.map(d => d.sound_peak), name: 'Sound peak', type: 'scatter', mode: 'lines', line: { color: '#c084fc' } },
+    { x: ts, y: data.map(d => d.light),      name: 'Light lux',  type: 'scatter', mode: 'lines', line: { color: '#facc15' } },
   ], {
     ...layout,
     yaxis: { ...layout.xaxis },
@@ -166,6 +184,8 @@ async function renderDashboard() {
       </div>
       <div class="chart-wrap"><div id="chart1"></div></div>
       <div class="chart-wrap"><div id="chart2"></div></div>
+      <div class="chart-wrap"><div id="chart3"></div></div>
+      <div class="chart-wrap"><div id="chart4"></div></div>
       <p class="doc-count" id="doc-count"></p>
       <footer class="dash-footer"><a href="/">noelcaverly.com</a></footer>
     </div>`;

@@ -17,15 +17,24 @@ async function rollupTier({ srcCol, dstCol, cutoff, windowSec, label }) {
   const snap = await db.collection(srcCol).where('timestamp', '<', cutoff).get();
   if (snap.empty) return { rolled: 0, deleted: 0 };
 
+  const SENSOR_FIELDS = ['temperature', 'humidity', 'pressure', 'pm1_0', 'pm2_5', 'pm10', 'sound_avg', 'sound_peak', 'light'];
+
   const windows = new Map();
   for (const doc of snap.docs) {
     const d = doc.data();
     const key = floorTo(d.timestamp, windowSec);
-    if (!windows.has(key)) windows.set(key, { docs: [], fields: { temperature: 0, humidity: 0, light: 0, sound: 0, dust: 0 } });
+    if (!windows.has(key)) {
+      const sums = {}; const counts = {};
+      for (const f of SENSOR_FIELDS) { sums[f] = 0; counts[f] = 0; }
+      windows.set(key, { docs: [], samples: 0, sums, counts });
+    }
     const w = windows.get(key);
     w.docs.push(doc.ref);
-    for (const f of ['temperature', 'humidity', 'light', 'sound', 'dust']) {
-      w.fields[f] += d[f];
+    // Raw docs weigh 1; aggregate docs weigh by the samples they summarize
+    const weight = d.count ?? 1;
+    w.samples += weight;
+    for (const f of SENSOR_FIELDS) {
+      if (d[f] != null) { w.sums[f] += d[f] * weight; w.counts[f] += weight; }
     }
   }
 
@@ -33,15 +42,14 @@ async function rollupTier({ srcCol, dstCol, cutoff, windowSec, label }) {
   let writeBatch = db.batch();
   let writeCount = 0;
   for (const [windowStart, w] of windows) {
-    const n = w.docs.length;
     const avg = {};
-    for (const f of ['temperature', 'humidity', 'light', 'sound', 'dust']) {
-      avg[f] = w.fields[f] / n;
+    for (const f of SENSOR_FIELDS) {
+      if (w.counts[f] > 0) avg[f] = w.sums[f] / w.counts[f];
     }
     writeBatch.set(db.collection(dstCol).doc(String(windowStart)), {
       timestamp: windowStart,
       ...avg,
-      count: n,
+      count: w.samples,
     }, { merge: true });
     writeCount++;
     if (writeCount % 499 === 0) {
